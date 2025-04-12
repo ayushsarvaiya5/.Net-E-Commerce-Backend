@@ -1,0 +1,44 @@
+
+how to download redis:
+
+1. download a legacy Redis Windows port from: https://github.com/microsoftarchive/redis/releases
+
+After downloading:
+
+2. Unzip it to a folder (e.g., C:\Redis).
+
+
+
+3. Add Redis to System PATH
+If you already have Redis installed:
+
+Find where redis-cli.exe is located (e.g., C:\Redis).
+
+Add that folder to your PATH:
+
+Search "Environment Variables" in Windows.
+
+Edit the "Path" variable.
+
+Add the folder path (e.g., C:\Redis).
+
+Restart your CMD.
+
+
+
+=> Hoe to Run :
+
+1. Navigate to that folder in CMD:
+
+cd C:\Redis
+redis-server.exe
+
+
+2. Open another CMD window and run:
+
+redis-cli.exe ping
+
+You should see PONG.
+
+
+

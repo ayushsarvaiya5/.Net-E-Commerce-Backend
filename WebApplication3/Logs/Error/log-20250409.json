@@ -1,0 +1,2 @@
+2025-04-09 00:26:11.623 +05:30 [ERR] Unhandled Exception Occurred. Path: /api/Mobile/Get-Mobile-By-Id/5, Method: GET {}
+2025-04-09 00:27:12.483 +05:30 [ERR] Unhandled Exception Occurred. Path: /api/Mobile/Get-Mobiles-Paginated, Method: GET {}

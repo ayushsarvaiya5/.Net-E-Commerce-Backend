@@ -1,0 +1,122 @@
+
+
+
+DTO
+CORS
+Consistant ApiResponse & ApiError
+used Mapper -> for Mapping
+Authentication & Authorization by JWT
+Role base Access
+Password Hashed by Bcrypt
+Model Validation
+Costome Middleware -> for appending user data in each request
+use Repository & Service Pattern
+Entity framework for PostgreSQL
+Searching, filtering, sorting, Pagination
+Rate Limiting
+image uploading by Cloudinory
+Model and DTO Validation
+Fluent Api
+Logging & Monitoring (Serilog)
+Lazy & Eager loading
+ODAta
+Globle Exeption Handler Middleware
+Api Versioning
+Api Sunset (Api deprecation)
+Soft Deleting
+
+=> 2 leyer of cashing
+1. inmemory cashe
+2. radish cashe
+
+
+
+
+Health Checks & Circuit Breaker Pattern
+Mobile Comparison Page
+Pagination -> via Cursor and Indexing for optimation
+Api versioning
+Database versioning
+Fluent Validation
+Fluent API
+POCO
+Reverse Proxy
+CQRS (Command Query Responsibility Segregation)
+
+Background Services in .NET Core
+-> Send emails (order confirmation, shipment)
+-> Validates stock
+
+ SignalR – Real-Time Communication 
+ SignalR Basics & Hub Methods
+
+Client-Server Communication
+
+Streaming & Broadcasting
+
+Scaling SignalR with Redis
+
+
+pagination:
+public async Task<PaginatedResponse<UserModel>> GetUsersPaginatedAsync(int? lastUserId, int pageSize)
+{
+    var query = _db.Users.AsQueryable();
+
+    if (lastUserId.HasValue)
+    {
+        query = query.Where(u => u.Id > lastUserId.Value);
+    }
+
+    var users = await query
+        .OrderBy(u => u.Id) // Order by ID for proper pagination
+        .Take(pageSize)
+        .ToListAsync();
+
+    return new PaginatedResponse<UserModel>
+    {
+        Data = users,
+        PageSize = pageSize,
+        TotalCount = await _db.Users.CountAsync()
+    };
+}
+
+First API Call (Page 1)
+GET /api/users?pageSize=10
+
+
+Second API Call (Page 2)
+GET /api/users?lastUserId=10&pageSize=10
+
+
+
+=> Use Cases of .NET Core:
+
+Console applications (dotnet new console)
+
+Windows, Linux, and macOS apps
+
+Microservices
+
+Cloud applications
+
+Internet of Things (IoT) apps
+
+Game development (via Unity)
+
+Machine learning (ML.NET)
+
+
+
+=> Use Cases of ASP.NET Core:
+
+Web applications (MVC & Razor Pages)
+
+REST APIs
+
+Real-time apps (SignalR)
+
+Blazor apps (C# instead of JavaScript for UI)
+
+Microservices
+
+Server-side web apps
