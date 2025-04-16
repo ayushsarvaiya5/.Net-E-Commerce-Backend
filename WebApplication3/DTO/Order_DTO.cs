@@ -6,8 +6,6 @@ using WebApplication3.Model;
 
 namespace WebApplication3.DTO
 {
-    // DTOs for creating an order
-
     public class CreateOrderDtoFirst
     {
 

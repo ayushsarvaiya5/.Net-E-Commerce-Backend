@@ -43,16 +43,6 @@ public class UserMiddleware
             }
             else
             {
-                //Console.WriteLine("Token validation failed. Removing invalid token.");
-                //context.Response.Cookies.Delete("AccessToken"); 
-
-                //context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                //await context.Response.WriteAsync("Unauthorized: Invalid or expired token.");
-                //return;
-
-                //Console.WriteLine("Token validation failed. Removing invalid token.");
-
-
                 context.Response.Cookies.Delete("AccessToken");
 
                 var response = new ApiResponse<string>(

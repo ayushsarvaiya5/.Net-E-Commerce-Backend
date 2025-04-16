@@ -24,10 +24,14 @@ Globle Exeption Handler Middleware
 Api Versioning
 Api Sunset (Api deprecation)
 Soft Deleting
+Response Compression
 
 => 2 leyer of cashing
 1. inmemory cashe
 2. radish cashe
+
+
+
 
 
 
@@ -120,3 +124,29 @@ Blazor apps (C# instead of JavaScript for UI)
 Microservices
 
 Server-side web apps
+
+
+
+
+
+Background Service
+
+Common Use Cases:
+Background jobs (sending emails, notifications)
+
+Polling external APIs
+
+Queued job processing (like a worker queue)
+
+Scheduled tasks (cron-like behavior)
+
+Event consumers (like Kafka, RabbitMQ, Azure Service Bus)
+
+
+Types of Background Services in .NET
+Hosted Services – Using IHostedService interface
+
+BackgroundService – A base class that simplifies IHostedService
+
+Worker Services – A template for building background apps (like Windows services, daemons)
+

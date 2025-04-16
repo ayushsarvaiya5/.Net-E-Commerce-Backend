@@ -33,18 +33,11 @@ namespace WebApplication3.Mappings
 
 
             // Cart
-            // Map from DTO to Entity
             CreateMap<CartAddDTO, CartModel>();
 
-            // Map from Entity to Response DTO
             CreateMap<CartModel, CartResponseDTO>()
                 .ForMember(dest => dest.MobileName, opt => opt.MapFrom(src => src.Mobile != null ? src.Mobile.Name : string.Empty))
                 .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Mobile != null ? src.Mobile.Price : 0));
-
-            // Order
-            //CreateMap<OrderModel, OrderDetailsDto>();
-            //CreateMap<CreateOrderDto, OrderModel>();
-            //CreateMap<CreateOrderItemDto, OrderItemModel>();
 
             // Order mappings
             CreateMap<CreateOrderDto, OrderModel>()

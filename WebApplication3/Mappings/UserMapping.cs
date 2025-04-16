@@ -10,7 +10,7 @@ namespace WebApplication3.Mappings
         {
             // UserModel map to -> UserResponseDTO
             CreateMap<UserModel, UserResponseDTO>();
-            //CreateMap<UserModel, UserLoginResponseDTO>();
+            
         }
     }
 }

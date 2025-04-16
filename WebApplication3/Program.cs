@@ -1,142 +1,4 @@
 
-//ID: 1
-
-
-//using System.Net;
-//using System.Text;
-//using Microsoft.AspNetCore.Authentication.JwtBearer;
-//using Microsoft.AspNetCore.Mvc;
-//using Microsoft.EntityFrameworkCore;
-//using Microsoft.IdentityModel.Tokens;
-//using Microsoft.OpenApi.Models;
-//using WebApplication3.Data;
-//using WebApplication3.Mappings;
-//using WebApplication3.Utils;
-
-//namespace WebApplication3
-//{
-//    public class Program
-//    {
-//        public static void Main(string[] args)
-//        {
-//            var key = "supersecretkey123456123456123456";
-//            var builder = WebApplication.CreateBuilder(args);
-
-//            // Register DbContext and configure PostgreSQL
-//            builder.Services.AddDbContext<MobileDbContext>(options =>
-//                options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresConnection")));
-
-//            // adding controller routing & for ModelState error handeling
-//            builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
-//            {
-//                options.InvalidModelStateResponseFactory = actionContext =>
-//                {
-//                    var errors = actionContext.ModelState.Values
-//                        .SelectMany(v => v.Errors)
-//                        .Select(e => e.ErrorMessage)
-//                        .ToList();
-
-//                    return new BadRequestObjectResult(new ApiError(
-//                        (int)HttpStatusCode.BadRequest,
-//                        "Validation Failed",
-//                        errors
-//                    ));
-//                };
-//            });
-
-//            // AutoMapper -> for autmatting converting into DTOs
-//            builder.Services.AddAutoMapper(typeof(UserMapping));
-
-//            // JWT Authentication
-//            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-//                .AddJwtBearer(options =>
-//                {
-//                    options.TokenValidationParameters = new TokenValidationParameters
-//                    {
-//                        ValidateIssuer = false,
-//                        ValidateAudience = false,
-//                        ValidateLifetime = true,
-//                        ValidateIssuerSigningKey = true,
-//                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
-//                    };
-//                });
-
-//            builder.Services.AddAuthorization(options =>
-//            {
-//                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-//                options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
-//                options.AddPolicy("EmployeeOnly", policy => policy.RequireRole("Employee"));
-//            });
-
-//            //builder.Services.AddSwaggerGen();
-
-//            builder.Services.AddSwaggerGen(options =>
-//            {
-//                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-//                {
-//                    Name = "Authorization",
-//                    Type = SecuritySchemeType.Http,
-//                    Scheme = "Bearer",
-//                    BearerFormat = "JWT",
-//                    In = ParameterLocation.Header,
-//                    Description = "Enter your valid token."
-//                });
-
-//                options.AddSecurityRequirement(new OpenApiSecurityRequirement
-//                {
-//                    {
-//                        new OpenApiSecurityScheme
-//                        {
-//                            Reference = new OpenApiReference
-//                            {
-//                                Type = ReferenceType.SecurityScheme,
-//                                Id = "Bearer"
-//                            }
-//                        },
-//                        new string[] {}
-//                    }
-//                });
-//            });
-
-//            var app = builder.Build();
-
-//            if (app.Environment.IsDevelopment())
-//            {
-//                app.UseSwagger();
-//                app.UseSwaggerUI();
-//            }
-
-//            app.UseAuthentication();
-//            app.UseAuthorization();
-
-//            app.MapControllers();
-
-//            app.Run();
-//        }
-//    }
-//}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//Id: 2
-// Code with Database, DTO, JWT, authorization, Cokkies
-
-
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -162,6 +24,7 @@ using WebApplication3.Middlewares;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using StackExchange.Redis;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace WebApplication3
 {
@@ -217,8 +80,6 @@ namespace WebApplication3
 
 
             // JWT Authentication
-            //var key = "supersecretkey123456123456123456";
-
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -229,7 +90,6 @@ namespace WebApplication3
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:SecretKey"]))
-                    //IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
                 };
         
                 options.Events = new JwtBearerEvents
@@ -262,9 +122,6 @@ namespace WebApplication3
             {
                 options.Configuration = builder.Configuration["RedisConnectionStrings:Redis"];
             });
-
-
-            //builder.Services.AddSwaggerGen();
 
             builder.Services.AddSwaggerGen(options =>
             {
@@ -311,7 +168,7 @@ namespace WebApplication3
 
             builder.Services.ConfigureOptions<ConfigureSwaggerOptions>();
 
-            // Rate Limiting
+            // Rate Limiting => Window
             builder.Services.AddRateLimiter(options =>
             {
                 options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
@@ -359,6 +216,35 @@ namespace WebApplication3
                            .Count() // Enable $count
                            .AddRouteComponents("odata", modelBuilder.GetEdmModel()));
 
+
+            // Response Compression 
+            builder.Services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.Providers.Add<BrotliCompressionProvider>();
+                options.Providers.Add<GzipCompressionProvider>();
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+                {
+                    "application/json", // compress JSON responses
+                    "text/plain",
+                    "text/css",
+                    "application/javascript",
+                    "text/html",
+                    "image/svg+xml"
+                });
+            });
+
+            builder.Services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = System.IO.Compression.CompressionLevel.Optimal; // 3 Options : Fastest, Optimal, NoCompression
+            });
+
+            builder.Services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = System.IO.Compression.CompressionLevel.Optimal;
+            });
+
+
             // DI - Dependency Injection
 
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -377,6 +263,9 @@ namespace WebApplication3
             builder.Services.AddScoped<IOrderRepository, OrderRepository>();
             builder.Services.AddScoped<IOrderService, OrderService>();
 
+
+            builder.Services.AddSignalR();
+
             // Cloudinary Service
             builder.Services.AddSingleton<CloudinaryService>();
 
@@ -389,12 +278,8 @@ namespace WebApplication3
 
             var app = builder.Build();
 
-            //if (app.Environment.IsDevelopment())
-            //{
-            //    app.UseSwagger();
-            //    app.UseSwaggerUI();
-            //}
 
+            // Swagger
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -418,6 +303,8 @@ namespace WebApplication3
             app.UseRateLimiter();                           // Ratelimiting Middleware
 
             app.UseCors("CorsPolicy");                      // Cors Middleware
+
+            app.UseResponseCompression();                   // Response Compression
 
             app.UseAuthentication();                        // Athentication Middleware
 
